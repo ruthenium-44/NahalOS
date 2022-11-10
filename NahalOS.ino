@@ -1,16 +1,18 @@
 /*
-  ВНИМАНИЕ! ПУТЬ К ПАПКЕ СО СКЕТЧЕМ НЕ ДОЛЖЕН СОДЕРЖАТЬ РУССКИХ СИМВОЛОВ
-  ВО ИЗБЕЖАНИЕ ПРОБЛЕМ ПОЛОЖИТЕ ПАПКУ В КОРЕНЬ ДИСКА С
+!Во избежании проблем положите папку в C:
+При первой прошивке выполните калибровку.
 
-  Внимание! При первом запуске initial_calibration должен быть равен 1 (строка №17)
-  При подключении и открытии монитора порта будет запущен процесс калибровки.
-  Вам нужно при помощи вольтметра измерить напряжение на пинах 5V и GND,
-  затем отправить его в монитор В МИЛЛИВОЛЬТАХ, т.е. если на вольтметре 4.56
-  то отправить примерно 4560. После этого изменить initial_calibration на 0
-  и заново прошить Arduino.
-  Если хотите пропустить процесс калибровки, то введите то же самое напряжение,
-  что было показано вам при калибровке (real VCC). И снова прошейте код.
-  by ruthenium44
+Код от Alex Gyver, модифицировал ruthenium44
+
+https://github.com/ruthenium-44/NahalOS
+
+███╗░░██╗░█████╗░██╗░░░██╗░█████╗░██╗░░░░░ 
+████╗░██║██╔══██╗██║░░░██║██╔══██╗██║░░░░░
+██╔██╗██║███████║╚██╗░██╔╝███████║██║░░░░░ 
+██║╚████║██╔══██║░╚████╔╝░██╔══██║██║░░░░░
+██║░╚███║██║░░██║░░╚██╔╝░░██║░░██║███████╗
+╚═╝░░╚══╝╚═╝░░╚═╝░░░╚═╝░░░╚═╝░░╚═╝╚══════╝
+
 */
 //-----------------------------------НАСТРОЙКИ------------------------------------
 #define initial_calibration 0  // калибровка вольтметра 1 - включить, 0 - выключить
@@ -31,7 +33,7 @@
 #define butt_up 5    // кнопка вверх
 #define butt_down 4  // кнпока вниз
 #define butt_set 3   // кнопка выбора
-#define butt_vape 2  // кнопка "парить"
+#define butt_vape 2  // кнопка fire
 //-----------кнопки-----------
 
 //-----------флажки-----------
@@ -40,7 +42,7 @@ boolean up_flag, down_flag, set_flag, set_flag_hold, set_hold, vape_btt, vape_bt
 volatile boolean wake_up_flag, vape_flag;
 boolean change_v_flag, change_w_flag, change_o_flag;
 volatile byte mode, mode_flag = 1;
-boolean flag;  // флаг, разрешающий подать ток на койл (защита от КЗ, обрыва, разрядки)
+boolean flag;  // флаг разрешения подачи тока на коил
 //-----------флажки-----------
 
 //-----------пины-------------
@@ -141,8 +143,8 @@ void setup() {
     delay(5000);
     display.clearDisplay();
 
-    for (int16_t i = 0; i < max(display.width(), display.height()) / 2; i += 2) {
-      display.drawCircle(display.width() / 2, display.height() / 2, i, SSD1306_WHITE);
+    for (int16_t i = 0; i < max(display.width(), display.height()) / 2; i += 2) {       //Анимация выключения
+      display.drawCircle(display.width() / 2, display.height() / 2, i, SSD1306_WHITE);  
       display.display();
       delay(1);
     }
@@ -743,11 +745,7 @@ void calibration() {
   //------конец калибровки-------
 }
 
-void led_strobe() {
-while(true){
-    digitalWrite(LED_BUILTIN, HIGH);
-    delay(500);
-    digitalWrite(LED_BUILTIN, LOW);
+
 }
 }
 
