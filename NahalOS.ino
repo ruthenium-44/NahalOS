@@ -726,7 +726,6 @@ void calibration() {
   Serial.print("Real VCC is: ");
   Serial.println(readVcc());  // общаемся с пользователем
   Serial.println("Write your VCC (in millivolts)");
-  led_strobe();
   while (Serial.available() == 0)
     ;
   int Vcc = Serial.parseInt();                      // напряжение от пользователя
@@ -743,10 +742,10 @@ void calibration() {
   while (1)
     ;  // уйти в бесконечный цикл
   //------конец калибровки-------
-}
 
 
-}
+
+
 }
 
 long readVcc() {  //функция чтения внутреннего опорного напряжения, универсальная (для всех ардуин)
