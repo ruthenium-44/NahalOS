@@ -47,7 +47,7 @@ boolean flag;  // флаг разрешения подачи тока на ко�
 
 //-----------пины-------------
 #define mosfet 10  // пин мосфета (нагрев спирали)
-#define battery 3  // пин измерения напряжения акума
+#define battery 5  // пин измерения напряжения акума
 //-----------пины-------------
 
 //-----------дисплей-----------
@@ -62,10 +62,6 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define SCLK 6
 #define RCLK 7
 #define DIO 8
-unsigned char SYM[47];
-
-
-
 //-----------дисплей-----------
 
 int bat_vol, bat_volt_f;  // хранит напряжение на акуме
@@ -106,7 +102,6 @@ void setup() {
   pinMode(butt_vape, INPUT_PULLUP);
   pinMode(mosfet, OUTPUT);
   pinMode(disp_vcc, OUTPUT);
-  pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(disp_vcc, HIGH);
   Timer1.disablePwm(mosfet);  // принудительно отключить койл
   digitalWrite(mosfet, LOW);  // принудительно отключить койл
