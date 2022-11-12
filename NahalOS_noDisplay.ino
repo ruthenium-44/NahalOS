@@ -28,7 +28,7 @@ https://github.com/ruthenium-44/NahalOS
 
 //-----------кнопки-----------
 #define butt_up 5    // кнопка вверх
-#define butt_down 4  // кнпока вниз
+#define butt_down 4  // кнопка вниз
 #define butt_set 3   // кнопка выбора
 #define butt_vape 2  // кнопка fire
 //-----------кнопки-----------
