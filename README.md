@@ -100,7 +100,7 @@
 Таки не додумался что сделать с пустым местом внизу.
 
 #### Схема
-![Схема](displayIcons/noDisplay_scheme.png)
+![Схема](displayIcons/display.png)
 
 Подключение дисплея к Arduino:
 
