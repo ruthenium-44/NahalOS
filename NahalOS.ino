@@ -290,13 +290,11 @@ void loop() {
         if (mode == 0 && !vape_state && !set_hold) {
             if (mode_flag) {  // приветствие
                 mode_flag = 0;
-                // disp_send(VVOL);
-                delay(400);
-                //  disp.clear();
+                vavoDis();
             }
             //---------кнопка ВВЕРХ--------
             if (up_state && !up_flag) {
-                volts += 100;
+                volts += 10;
                 volts = min(volts, bat_volt_f);  // ограничение сверху на текущий заряд акума
                 up_flag = 1;
                 display.clearDisplay();
@@ -309,7 +307,7 @@ void loop() {
 
             //---------кнопка ВНИЗ--------
             if (down_state && !down_flag) {
-                volts -= 100;
+                volts -= 10;
                 volts = max(volts, 0);
                 down_flag = 1;
                 display.clearDisplay();
@@ -319,7 +317,7 @@ void loop() {
                 change_v_flag = 1;
             }
             //---------кнопка ВНИЗ--------
-            //  vavoDis();  // отобразить на дисплее
+              vavoDis();  // отобразить на дисплее
         }
         // ------------------режим ВАРИВОЛЬТ-------------------
 
@@ -365,9 +363,8 @@ void loop() {
         if (mode == 2 && !vape_state && !set_hold) {
             if (mode_flag) {  // приветствие
                 mode_flag = 0;
-                //  disp_send(COIL);
-                delay(400);
-                display.clearDisplay();
+                omSet();
+
             }
             //---------кнопка ВВЕРХ--------
             if (up_state && !up_flag) {
@@ -394,7 +391,7 @@ void loop() {
                 change_o_flag = 1;
             }
             //---------кнопка ВНИЗ--------
-            // disp.float_dot(ohms, 2);  // отобразить на дисплее
+            vavoDis();  // отобразить на дисплее
         }
         // ----------режим установки сопротивления-----------
 
@@ -668,8 +665,8 @@ void vavaDis() {
     display.setTextSize(1);
     display.setTextColor(WHITE);
     display.drawLine(0, 10, 128, 10, WHITE);
-    display.setCursor(50, 0);
-    display.print("VAVA");
+    display.setCursor(45, 0);
+    display.print("VarWatt");
     display.drawLine(0, 50, 128, 50, WHITE);
     display.setCursor(12, 55);
     display.print("BATTERY:");
@@ -691,12 +688,80 @@ void vavaDis() {
     display.print("OM:");
     display.setCursor(100, 20);
     display.print((float)ohms);
+    display.setCursor(72, 36);
+    display.print("VOLT:");
+    display.setCursor(100, 36);
+    display.print((float)volts / 1000);
     display.drawLine(68, 40, 128, 40, INVERSE);
     display.drawLine(0, 50, 128, 50, WHITE);
     display.drawLine(68, 30, 128, 30, WHITE);
     display.drawLine(68, 40, 128, 40, INVERSE);
     display.drawLine(68, 10, 68, 50, WHITE);
     display.drawLine(127, 30, 127, 50, WHITE);
+    display.display();
+}
+
+void vavoDis() {
+    display.clearDisplay();
+    display.setTextSize(1);
+    display.setTextColor(WHITE);
+    display.drawLine(0, 10, 128, 10, WHITE);
+    display.setCursor(45, 0);
+    display.print("VarVolt");
+    display.drawLine(0, 50, 128, 50, WHITE);
+    display.setCursor(12, 55);
+    display.print("BATTERY:");
+    display.setCursor(65, 55);
+    display.println((float) bat_vol / 8400 * 100);
+    display.setCursor(110, 55);
+    display.print("%");
+    display.setTextSize(2);
+    display.setCursor(5, 25);
+    display.print((float)volts / 1000);
+    display.setTextSize(1);
+    display.setCursor(55, 35);
+    display.print("V");
+    display.setCursor(72, 12);
+    display.print("PAFF:");
+    display.setCursor(100, 12);
+    display.print(pafs);
+    display.setCursor(72, 20);
+    display.print("OM:");
+    display.setCursor(100, 20);
+    display.print((float)ohms);
+    display.setCursor(72, 37);
+    display.print("WATT:");
+    display.setCursor(100, 37);
+    display.print(watts);
+    display.drawLine(68, 40, 128, 40, INVERSE);
+    display.drawLine(0, 50, 128, 50, WHITE);
+    display.drawLine(68, 30, 128, 30, WHITE);
+    display.drawLine(68, 40, 128, 40, INVERSE);
+    display.drawLine(68, 10, 68, 50, WHITE);
+    display.drawLine(127, 30, 127, 50, WHITE);
+    display.display();
+}
+
+void omSet() {
+    display.clearDisplay();
+    display.setTextSize(1);
+    display.setTextColor(WHITE);
+    display.drawLine(0, 10, 128, 10, WHITE);
+    display.setCursor(50, 0);
+    display.print("SET OM");
+    display.drawLine(0, 50, 128, 50, WHITE);
+    display.setCursor(12, 55);
+    display.print("BATTERY:");
+    display.setCursor(65, 55);
+    display.println((float) bat_vol / 8400 * 100);
+    display.setCursor(110, 55);
+    display.print("%");
+    display.setTextSize(3);
+    display.setCursor(5, 20);
+    display.print("OM:");
+    display.setCursor(55, 20);
+    display.print((float)ohms);
+    display.setCursor(72, 36);
     display.display();
 }
 
