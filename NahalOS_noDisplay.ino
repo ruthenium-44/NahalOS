@@ -20,6 +20,7 @@ https://github.com/ruthenium-44/NahalOS
 #define vape_threshold 5       // отсечка затяжки, в секундах
 #define turbo_mode 0           // турбо режим 1 - включить, 0 - выключить (не рекомендовано!)
 #define battery_low 3          // нижний порог срабатывания защиты от переразрядки аккумулятора, в Вольтах!
+const float ohms = 0.1;
 //-----------------------------------НАСТРОЙКИ------------------------------------
 
 #include <EEPROMex.h>  // библиотека для работы со внутренней памятью ардуино
@@ -49,9 +50,7 @@ boolean flag;  // флаг разрешения подачи тока на ко�
 
 //-----------дисплей-----------
 #include <TimerOne.h>  // библиотека таймера
-#define SCLK 6
-#define RCLK 7
-#define DIO 8
+
 //-----------дисплей-----------
 
 int bat_vol, bat_volt_f;  // хранит напряжение на акуме
@@ -66,7 +65,6 @@ float PWM_filter_k = 0.1;
 
 unsigned long last_time, vape_press, set_press, last_vape, wake_timer, timerIsr;  // таймеры
 int volts, watts;                                                                 // храним вольты и ватты
-float ohms;                                                                       // храним омы
 float my_vcc_const;                                                               // константа вольтметра
 volatile byte vape_mode, vape_release_count;
 
@@ -77,7 +75,6 @@ void setup() {
     //----читаем из памяти-----
     volts = EEPROM.readInt(0);
     watts = EEPROM.readInt(2);
-    ohms = EEPROM.readFloat(4);
     my_vcc_const = EEPROM.readFloat(8);
     pafs = EEPROM.readInt(5);
     //----читаем из памяти-----
@@ -88,7 +85,6 @@ void setup() {
     //---настройка кнопок и выходов-----
     pinMode(butt_up, INPUT_PULLUP);
     pinMode(butt_down, INPUT_PULLUP);
-    pinMode(butt_set, INPUT_PULLUP);
     pinMode(butt_vape, INPUT_PULLUP);
     pinMode(mosfet, OUTPUT);
     Timer1.disablePwm(mosfet);  // принудительно отключить койл
@@ -130,11 +126,10 @@ void loop() {
     //-----------опрос кнопок-----------
     up_state = !digitalRead(butt_up);
     down_state = !digitalRead(butt_down);
-    set_state = !digitalRead(butt_set);
     vape_state = !digitalRead(butt_vape);
 
     // если нажата любая кнопка, "продлить" таймер ухода в сон
-    if (up_state || down_state || set_state || vape_state) wake_timer = millis();
+    if (up_state || down_state || vape_state) wake_timer = millis();
     //-----------опрос кнопок-----------
 
     //service_mode();  // раскомментировать для отладки кнопок
@@ -168,46 +163,11 @@ void loop() {
         if (!set_state && set_flag) {  // если нажали-отпустили
             set_hold = 0;
             set_flag = 0;
-            mode++;  // сменить режим
             mode_flag = 1;
-            if (mode > 2) mode = 0;  // ограничение на 3 режима
+            if (mode != 1) mode = 1;  // ограничение на 3 режима
         }
         // ----------------------отработка нажатия SET и изменение режимов---------------------------
 
-        // ------------------режим ВАРИВОЛЬТ-------------------
-        if (mode == 0 && !vape_state && !set_hold) {
-            if (mode_flag) {  // приветствие
-                mode_flag = 0;
-                // disp_send(VVOL);
-                delay(400);
-                //  disp.clear();
-            }
-            //---------кнопка ВВЕРХ--------
-            if (up_state && !up_flag) {
-                volts += 100;
-                volts = min(volts, bat_volt_f);  // ограничение сверху на текущий заряд акума
-                up_flag = 1;
-            }
-            if (!up_state && up_flag) {
-                up_flag = 0;
-                change_v_flag = 1;
-            }
-            //---------кнопка ВВЕРХ--------
-
-            //---------кнопка ВНИЗ--------
-            if (down_state && !down_flag) {
-                volts -= 100;
-                volts = max(volts, 0);
-                down_flag = 1;
-            }
-            if (!down_state && down_flag) {
-                down_flag = 0;
-                change_v_flag = 1;
-            }
-            //---------кнопка ВНИЗ--------
-            //  vavoDis();  // отобразить на дисплее
-        }
-        // ------------------режим ВАРИВОЛЬТ-------------------
 
 
         // ------------------режим ВАРИВАТТ-------------------
@@ -243,39 +203,6 @@ void loop() {
         }
         // ------------------режим ВАРИВАТТ--------------
 
-        // ----------режим установки сопротивления-----------
-        if (mode == 2 && !vape_state && !set_hold) {
-            if (mode_flag) {  // приветствие
-                mode_flag = 0;
-                //  disp_send(COIL);
-                delay(400);
-            }
-            //---------кнопка ВВЕРХ--------
-            if (up_state && !up_flag) {
-                ohms += 0.05;
-                ohms = min(ohms, 3);
-                up_flag = 1;
-            }
-            if (!up_state && up_flag) {
-                up_flag = 0;
-                change_o_flag = 1;
-            }
-            //---------кнопка ВВЕРХ--------
-
-            //---------кнопка ВНИЗ--------
-            if (down_state && !down_flag) {
-                ohms -= 0.05;
-                ohms = max(ohms, 0);
-                down_flag = 1;
-            }
-            if (!down_state && down_flag) {
-                down_flag = 0;
-                change_o_flag = 1;
-            }
-            //---------кнопка ВНИЗ--------
-            // disp.float_dot(ohms, 2);  // отобразить на дисплее
-        }
-        // ----------режим установки сопротивления-----------
 
         //---------отработка нажатия кнопки парения-----------
         if (vape_state && flag && !wake_up_flag) {
@@ -438,14 +365,6 @@ void good_night() {
 
 //----------режим теста кнопок----------
 void service_mode() {
-    if (set_state && !set_flag) {
-        set_flag = 1;
-        Serial.println("SET pressed");
-    }
-    if (!set_state && set_flag) {
-        set_flag = 0;
-        Serial.println("SET released");
-    }
     if (up_state && !up_flag) {
         up_flag = 1;
         Serial.println("UP pressed");
