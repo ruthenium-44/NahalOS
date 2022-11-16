@@ -18,10 +18,10 @@ https://github.com/ruthenium-44/NahalOS
 #define initial_calibration 0  // калибровка вольтметра 1 - включить, 0 - выключить
 #define welcome 1              // приветствие
 #define battery_info 0         // отображение напряжения аккумулятора при запуске, 1 - включить, 0 - выключить
+#define battery_info_time 1000 // время отображения напряжения аккумулятора при запуске в миллисекундах
 #define sleep_timer 45         // таймер сна в секундах
 #define vape_threshold 5       // отсечка затяжки, в секундах
 #define turbo_mode 0           // турбо режим 1 - включить, 0 - выключить (не рекомендовано!)
-#define battery_percent 0      // отображать заряд в процентах, 1 - включить, 0 - выключить
 #define battery_low 3          // нижний порог срабатывания защиты от переразрядки аккумулятора, в Вольтах!
 //-----------------------------------НАСТРОЙКИ------------------------------------
 
@@ -127,17 +127,11 @@ void setup() {
         display.clearDisplay();
         display.setTextSize(2);
         display.setTextColor(WHITE);
-        display.setCursor(16, 15);
-        display.println("SOSI HUY");
-        display.setCursor(12, 40);
+        display.setCursor(5, 15);
+        display.println("IDI NA HUY");
+        display.setCursor(10, 40);
         display.println("OR CHARGE");
         display.display();
-
-        for (int16_t i = 0; i < max(display.width(), display.height()) / 2; i += 2) {       //Анимация выключения
-            display.drawCircle(display.width() / 2, display.height() / 2, i, SSD1306_WHITE);
-            display.display();
-            delay(1);
-        }
         delay(3000);
         display.clearDisplay();
         Timer1.disablePwm(mosfet);  // принудительно отключить койл
@@ -162,8 +156,7 @@ void setup() {
         display.setCursor(100, 30);
         display.println("V");
         display.display();
-        delay(500);
-        delay(1000);
+        delay(battery_info_time);
         display.clearDisplay();
     }
 }
@@ -179,17 +172,11 @@ void loop() {
             display.clearDisplay();
             display.setTextSize(2);
             display.setTextColor(WHITE);
-            display.setCursor(16, 15);
-            display.println("SOSI HUY");
-            display.setCursor(12, 40);
+            display.setCursor(5, 15);
+            display.println("IDI NA HUY");
+            display.setCursor(10, 40);
             display.println("OR CHARGE");
             display.display();
-            delay(3000);
-            for (int16_t i = 0; i < max(display.width(), display.height()) / 2; i += 2) {
-                display.drawCircle(display.width() / 2, display.height() / 2, i, SSD1306_WHITE);
-                display.display();
-                delay(1);
-            }
             delay(3000);
             display.clearDisplay();
             Timer1.disablePwm(mosfet);  // принудительно отключить койл
@@ -230,7 +217,6 @@ void loop() {
                 set_flag_hold = 1;
             }
             if (round(millis() / 150) % 2 == 0) {
-                if (!battery_percent) {
                     display.clearDisplay();
                     display.clearDisplay();
                     display.setTextSize(1);
@@ -249,26 +235,6 @@ void loop() {
                     delay(500);
                     delay(1000);
                     display.clearDisplay();  // показать заряд акума в вольтах
-                } else {
-                    display.clearDisplay();
-                    display.clearDisplay();
-                    display.setTextSize(1);
-                    display.setTextColor(WHITE);
-                    display.setCursor(15, 25);
-                    display.print("BATTERY");
-                    display.setCursor(60, 20);
-                    display.println((float)bat_vol / 8400 * 100);
-                    display.setCursor(100, 20);
-                    display.print("%");
-                    display.setCursor(60, 30);
-                    display.println((float)bat_vol / 1000);
-                    display.setCursor(100, 30);
-                    display.println("V");
-                    display.display();
-                    delay(500);
-                    delay(1000);
-                    display.clearDisplay();  // показать заряд акума в процентах
-                }
             }
         }
         if (set_hold && !set_state && set_flag_hold) {  // если удерживалась и была отпущена
@@ -430,7 +396,7 @@ void loop() {
                     // else disp_send(vape2);                                        // мигать медленно
                     if (mode == 0) {                                              // если ВАРИВОЛЬТ
                         PWM = (float)volts / bat_volt_f * 1024;                     // считаем значение для ШИМ сигнала
-                        if (PWM > 1023) PWM = 1023;                                 // ограничил PWM "по тупому", потому что constrain сука не работает!
+                        if (PWM > 1023) PWM = 1023;                                 // ограничил PWM "по-тупому", потому что constrain сука не работает!
                         PWM_f = PWM_filter_k * PWM + (1 - PWM_filter_k) * PWM_old;  // фильтруем
                         PWM_old = PWM_f;                                            // фильтруем
                     }
@@ -492,12 +458,12 @@ void loop() {
             display.clearDisplay();
             display.setTextSize(2);
             display.setTextColor(WHITE);
-            display.setCursor(16, 15);
-            display.println("SOSI HUY");
-            display.setCursor(12, 40);
+            display.setCursor(5, 15);
+            display.println("IDI NA HUY");
+            display.setCursor(10, 40);
             display.println("OR CHARGE");
             display.display();
-            delay(1000);
+            delay(3000);
             display.clearDisplay();
             vape_flag = 1;
         }
