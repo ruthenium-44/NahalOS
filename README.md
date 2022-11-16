@@ -200,7 +200,7 @@
 
 И наконец главное меню:
 
-![Image: Interface](displayIcons/vavadisnew.png)
+![Image: Interface](displayIcons/vavadis.png)
 
 Меняем режимы кнопкой SET.
 
