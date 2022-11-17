@@ -1,7 +1,11 @@
 
 <h1 align="center">NahalOS v0.4.2β 💢 </h1>
 
-<h6 align="center">Агрессивная ОС для самодельного боксмода лNaVal.</h6>
+<p align="center">
+  <img src="displayIcons/logo.jpg" />
+</p>
+
+<h6 align="center">Агрессивная ОС для самодельного боксмода NaVal.</h6>
 
 ![GitHub last commit](https://img.shields.io/github/last-commit/ruthenium-44/NahalOS?label=%D0%BF%D0%BE%D1%81%D0%BB%D0%B5%D0%B4%D0%BD%D0%B8%D0%B9%20%D0%BA%D0%BE%D0%BC%D0%BC%D0%B8%D1%82&style=for-the-badge)
 
