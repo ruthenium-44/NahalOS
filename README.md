@@ -7,11 +7,17 @@
 
 <h6 align="center">Агрессивная ОС для самодельного боксмода NaVal.</h6>
 
-![GitHub last commit](https://img.shields.io/github/last-commit/ruthenium-44/NahalOS?label=%D0%BF%D0%BE%D1%81%D0%BB%D0%B5%D0%B4%D0%BD%D0%B8%D0%B9%20%D0%BA%D0%BE%D0%BC%D0%BC%D0%B8%D1%82&style=for-the-badge)
+<p align="left">
+  <img src="https://img.shields.io/github/last-commit/ruthenium-44/NahalOS?label=%D0%BF%D0%BE%D1%81%D0%BB%D0%B5%D0%B4%D0%BD%D0%B8%D0%B9%20%D0%BA%D0%BE%D0%BC%D0%BC%D0%B8%D1%82&style=for-the-badge" />
+</p>
 
-![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/ruthenium-44/NahalOS?label=%D0%A0%D0%95%D0%9B%D0%98%D0%B7&style=for-the-badge)
+<p align="center">
+  <img src="https://img.shields.io/github/v/release/ruthenium-44/NahalOS?label=%D0%A0%D0%95%D0%9B%D0%98%D0%B7&style=for-the-badge" />
+</p>
 
-![License](https://img.shields.io/badge/Лицензия-MIT-blue%20?style=for-the-badge)
+<p align="right">
+  <img src="https://img.shields.io/badge/Лицензия-MIT-blue%20?style=for-the-badge" />
+</p>
 
 ### Дисклеймер💀
 
