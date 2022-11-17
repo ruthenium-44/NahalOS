@@ -574,12 +574,6 @@ void good_night() {
     display.println("PROSCHAI!");
     display.display();
     delay(2000);
-    for (int16_t i = 0; i < display.height() / 2; i += 3) {
-        // The INVERSE color is used so rectangles alternate white/black
-        display.fillRect(i, i, display.width() - i * 2, display.height() - i * 2, SSD1306_INVERSE);
-        display.display();  // Update screen with each newly-drawn rectangle
-        delay(1);
-    }
     display.clearDisplay();
     Timer1.disablePwm(mosfet);  // принудительно отключить койл
     digitalWrite(mosfet, LOW);  // принудительно отключить койл
