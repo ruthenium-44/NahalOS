@@ -25,7 +25,7 @@ https://github.com/ruthenium-44/NahalOS
 #define battery_low 3          // нижний порог срабатывания защиты от переразрядки аккумулятора, в Вольтах!
 //-----------------------------------НАСТРОЙКИ------------------------------------
 
-#include <EEPROMex.h>  // библиотека для работы со внутренней памятью ардуино
+#include <EEPROMex.h>  // библиотека для работы со внутренней памятью
 #include <LowPower.h>  // библиотека сна
 
 
@@ -196,7 +196,7 @@ void loop() {
 
     //service_mode();  // раскомментировать для отладки кнопок
     // показывает, какие кнопки нажаты или отпущены
-    // использовать для проерки правильности подключения
+    // использовать для проверки правильности подключения
 
     //---------------------отработка нажатия SET и изменение режимов---------------------
     if (flag) {                      // если акум заряжен
@@ -234,7 +234,7 @@ void loop() {
                     display.display();
                     delay(500);
                     delay(1000);
-                    display.clearDisplay();  // показать заряд акума в вольтах
+                    display.clearDisplay();
             }
         }
         if (set_hold && !set_state && set_flag_hold) {  // если удерживалась и была отпущена
@@ -260,7 +260,7 @@ void loop() {
             }
             //---------кнопка ВВЕРХ--------
             if (up_state && !up_flag) {
-                volts += 10;
+                volts += 10;                     // добавить 0.01 вольта
                 volts = min(volts, bat_volt_f);  // ограничение сверху на текущий заряд акума
                 up_flag = 1;
                 display.clearDisplay();
@@ -273,7 +273,7 @@ void loop() {
 
             //---------кнопка ВНИЗ--------
             if (down_state && !down_flag) {
-                volts -= 10;
+                volts -= 10;                     // убрать 0.01 вольта
                 volts = max(volts, 0);
                 down_flag = 1;
                 display.clearDisplay();
@@ -291,7 +291,7 @@ void loop() {
         // ------------------режим ВАРИВАТТ-------------------
 
         if (mode == 1 && !vape_state && !set_hold) {
-            if (mode_flag) {  // приветствие
+            if (mode_flag) {
                 mode_flag = 0;
                 vavaDis();
             }
@@ -299,7 +299,7 @@ void loop() {
             if (up_state && !up_flag) {
                 watts += 1;
                 byte maxW = (sq((float)bat_volt_f / 1000)) / ohms;
-                watts = min(watts, maxW);  // ограничение сверху на текущий заряд акума и сопротивление
+                watts = min(watts, maxW);  // ограничение сверху на текущий заряд и сопротивление
                 up_flag = 1;
                 display.clearDisplay();
             }
@@ -327,7 +327,7 @@ void loop() {
 
         // ----------режим установки сопротивления-----------
         if (mode == 2 && !vape_state && !set_hold) {
-            if (mode_flag) {  // приветствие
+            if (mode_flag) {
                 mode_flag = 0;
                 omSet();
 
@@ -385,29 +385,48 @@ void loop() {
                 display.clearDisplay();
                 display.setTextSize(2);
                 display.setTextColor(WHITE);
-                display.setCursor(13, 25);
-                display.print("OVERTIME!");
+                display.setCursor(5, 25);
+                display.print("KUDA BLYA?");
                 display.display();
             }
-
             if (vape_mode == 1) {  // обычный режим парения
-                if (round(millis() / 150) % 2 == 0)
-                    //   disp_send(vape1);
-                    // else disp_send(vape2);                                        // мигать медленно
+                if (round(millis() / 150) % 2 == 0) {
+                    if (millis() - vape_press < 5000) { //анимация
+                        display.clearDisplay();
+                        display.setTextSize(1);
+                        display.setTextColor(WHITE);
+                        display.drawLine(0, 10, 128, 10, WHITE);
+                        display.setCursor(30, 0);
+                        display.print("SOSESH UZHE:");
+                        display.setTextSize(3);
+                        display.setCursor(100, 25);
+                        display.print("s");
+                        display.setCursor(20, 25);
+                        display.print((float)(millis() - vape_press) / 1000);
+                        display.setCursor(72, 36);
+                        display.display();
+                    }
+                }
                     if (mode == 0) {                                              // если ВАРИВОЛЬТ
                         PWM = (float)volts / bat_volt_f * 1024;                     // считаем значение для ШИМ сигнала
                         if (PWM > 1023) PWM = 1023;                                 // ограничил PWM "по-тупому", потому что constrain сука не работает!
                         PWM_f = PWM_filter_k * PWM + (1 - PWM_filter_k) * PWM_old;  // фильтруем
                         PWM_old = PWM_f;                                            // фильтруем
                     }
+                    if (mode == 1) {                                              // если ВАРИВАТТ
+                        PWM = (float)sqrt(watts * ohms) / bat_volt_f * 1024;        // считаем значение для ШИМ сигнала
+                        if (PWM > 1023) PWM = 1023;                                 // ограничил PWM "по-тупому", потому что constrain сука не работает!
+                        PWM_f = PWM_filter_k * PWM + (1 - PWM_filter_k) * PWM_old;  // фильтруем
+                        PWM_old = PWM_f;                                            // фильтруем
+                    }
                 Timer1.pwm(mosfet, PWM_f);  // управление мосфетом
-                pafs += 1;                  // + тяга
+                pafs++;                  // + тяга
                 EEPROM.writeInt(5, pafs);
             }
             if (vape_mode == 2 && turbo_mode) {  // турбо режим парения (если включен)
-                if (round(millis() / 50) % 2 == 0)
-                    //   disp_send(vape1);
-                    // else disp_send(vape2);    // мигать быстро
+                if (round(millis() / 50) % 2 == 0) {
+                    //   Когда-нибудь здесь будет анимация
+                }
                     digitalWrite(mosfet, 1);  // херачить на полную мощность
             }
             if (vape_mode == 3) {  // тройное нажатие
@@ -439,22 +458,19 @@ void loop() {
             // если есть изменения в настройках, записать в память
             if (change_v_flag) {
                 EEPROM.writeInt(0, volts);
-                EEPROM.writeInt(5, pafs);
                 change_v_flag = 0;
             }
             if (change_w_flag) {
                 EEPROM.writeInt(2, watts);
-                EEPROM.writeInt(5, pafs);
                 change_w_flag = 0;
             }
             if (change_o_flag) {
                 EEPROM.writeFloat(4, ohms);
-                EEPROM.writeInt(5, pafs);
                 change_o_flag = 0;
             }
             // если есть изменения в настройках, записать в память
         }
-        if (vape_state && !flag) {  // если акум сел, а мы хотим подымить
+        if (vape_state && !flag) {  // если сел, а мы хотим подымить
             display.clearDisplay();
             display.setTextSize(2);
             display.setTextColor(WHITE);
@@ -574,12 +590,6 @@ void good_night() {
     display.println("PROSCHAI!");
     display.display();
     delay(2000);
-    for (int16_t i = 0; i < display.height() / 2; i += 3) {
-        // The INVERSE color is used so rectangles alternate white/black
-        display.fillRect(i, i, display.width() - i * 2, display.height() - i * 2, SSD1306_INVERSE);
-        display.display();  // Update screen with each newly-drawn rectangle
-        delay(1);
-    }
     display.clearDisplay();
     Timer1.disablePwm(mosfet);  // принудительно отключить койл
     digitalWrite(mosfet, LOW);  // принудительно отключить койл
@@ -626,7 +636,9 @@ void service_mode() {
     }
 }
 //----------режим теста кнопок----------
-void vavaDis() {
+
+//----------------Экраны----------------
+void vavaDis() {  //Вариватт
     display.clearDisplay();
     display.setTextSize(1);
     display.setTextColor(WHITE);
@@ -667,7 +679,7 @@ void vavaDis() {
     display.display();
 }
 
-void vavoDis() {
+void vavoDis() { //Варивольт
     display.clearDisplay();
     display.setTextSize(1);
     display.setTextColor(WHITE);
@@ -708,7 +720,7 @@ void vavoDis() {
     display.display();
 }
 
-void omSet() {
+void omSet() { //Настройка ома
     display.clearDisplay();
     display.setTextSize(1);
     display.setTextColor(WHITE);
