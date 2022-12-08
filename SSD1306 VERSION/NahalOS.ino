@@ -73,7 +73,7 @@ float filter_k = 0.04;
 float PWM_filter_k = 0.1;
 //-------переменные и коэффициенты для фильтра-------
 
-unsigned long last_time, vape_press, set_press, last_vape, wake_timer, timerIsr;  // таймеры
+unsigned long last_time, vape_press, set_press, last_vape, wake_timer, timerIsr, lastpaff;  // таймеры
 int volts, watts;                                                                 // храним вольты и ватты
 float ohms;                                                                       // храним омы
 float my_vcc_const;                                                               // константа вольтметра
@@ -158,6 +158,7 @@ void setup() {
         display.display();
         delay(battery_info_time);
         display.clearDisplay();
+        display.display();
     }
 }
 
@@ -421,11 +422,24 @@ void loop() {
                     }
                 Timer1.pwm(mosfet, PWM_f);  // управление мосфетом
                 pafs++;                  // + тяга
+                lastpaff = millis() - vape_press;  // время затяжки
                 EEPROM.writeInt(5, pafs);
             }
             if (vape_mode == 2 && turbo_mode) {  // турбо режим парения (если включен)
                 if (round(millis() / 50) % 2 == 0) {
-                    //   Когда-нибудь здесь будет анимация
+                    display.clearDisplay();
+                    display.setTextSize(1);
+                    display.setTextColor(WHITE);
+                    display.drawLine(0, 10, 128, 10, WHITE);
+                    display.setCursor(30, 0);
+                    display.print("SOSESH UZHE:");
+                    display.setTextSize(3);
+                    display.setCursor(100, 25);
+                    display.print("s");
+                    display.setCursor(20, 25);
+                    display.print((float)(millis() - vape_press) / 1000);
+                    display.setCursor(72, 36);
+                    display.display();
                 }
                     digitalWrite(mosfet, 1);  // херачить на полную мощность
             }
@@ -457,15 +471,15 @@ void loop() {
 
             // если есть изменения в настройках, записать в память
             if (change_v_flag) {
-                EEPROM.writeInt(0, volts);
+                EEPROM.writeInt(0, volts); //записываем вольты
                 change_v_flag = 0;
             }
             if (change_w_flag) {
-                EEPROM.writeInt(2, watts);
+                EEPROM.writeInt(2, watts); //записываем ватты
                 change_w_flag = 0;
             }
             if (change_o_flag) {
-                EEPROM.writeFloat(4, ohms);
+                EEPROM.writeFloat(4, ohms); //записываем омы
                 change_o_flag = 0;
             }
             // если есть изменения в настройках, записать в память
@@ -667,15 +681,15 @@ void vavaDis() {  //Вариватт
     display.setCursor(100, 20);
     display.print((float)ohms);
     display.setCursor(72, 36);
-    display.print("VOLT:");
+    display.print((float)lastpaff / 1000);
     display.setCursor(100, 36);
-    display.print((float)volts / 1000);
+    display.print("sec");
     display.drawLine(68, 40, 128, 40, INVERSE);
     display.drawLine(0, 50, 128, 50, WHITE);
     display.drawLine(68, 30, 128, 30, WHITE);
     display.drawLine(68, 40, 128, 40, INVERSE);
     display.drawLine(68, 10, 68, 50, WHITE);
-    display.drawLine(127, 30, 127, 50, WHITE);
+    display.drawLine(127, 10, 127, 50, WHITE);
     display.display();
 }
 
@@ -707,16 +721,16 @@ void vavoDis() { //Варивольт
     display.print("OM:");
     display.setCursor(100, 20);
     display.print((float)ohms);
-    display.setCursor(72, 37);
-    display.print("WATT:");
-    display.setCursor(100, 37);
-    display.print(watts);
+    display.setCursor(72, 36);
+    display.print((float)lastpaff / 1000);
+    display.setCursor(100, 36);
+    display.print("sec");
     display.drawLine(68, 40, 128, 40, INVERSE);
     display.drawLine(0, 50, 128, 50, WHITE);
     display.drawLine(68, 30, 128, 30, WHITE);
     display.drawLine(68, 40, 128, 40, INVERSE);
     display.drawLine(68, 10, 68, 50, WHITE);
-    display.drawLine(127, 30, 127, 50, WHITE);
+    display.drawLine(127, 10, 127, 50, WHITE);
     display.display();
 }
 
