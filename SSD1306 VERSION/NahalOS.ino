@@ -471,15 +471,15 @@ void loop() {
 
             // если есть изменения в настройках, записать в память
             if (change_v_flag) {
-                EEPROM.writeInt(0, volts);
+                EEPROM.writeInt(0, volts); //записываем вольты
                 change_v_flag = 0;
             }
             if (change_w_flag) {
-                EEPROM.writeInt(2, watts);
+                EEPROM.writeInt(2, watts); //записываем ватты
                 change_w_flag = 0;
             }
             if (change_o_flag) {
-                EEPROM.writeFloat(4, ohms);
+                EEPROM.writeFloat(4, ohms); //записываем омы
                 change_o_flag = 0;
             }
             // если есть изменения в настройках, записать в память
